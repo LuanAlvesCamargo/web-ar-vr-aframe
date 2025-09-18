@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Garagem Virtual com A-Frame</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-extras/dist/aframe-extras.min.js"></script>
+    <!-- O link da biblioteca de física foi atualizado para uma versão compatível com o A-Frame 1.4.2 -->
+    <script
+        src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v5.0.0/dist/aframe-physics-system.min.js"></script>
+</head>
+
+<body>
+    <a-scene background="color: #222222" physics="debug: false">
+
+        <a-assets>
+            <!-- Modelo do carro a ser carregado na cena -->
+            <a-asset-item id="fancy-car"
+                src="https://cdn.aframe.io/examples/post-processing/fancy-car.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- Câmera com colisão e nova posição -->
+        <a-entity camera look-controls wasd-controls="fly: false; acceleration: 15"
+            kinematic-body="radius: 0.3; height: 1.6" position="0 1.8 8">
+        </a-entity>
+
+        <!-- Ambiente da Garagem (dimensões originais) -->
+        <a-entity>
+            <!-- Piso -->
+            <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#555555" shadow="receive: true"
+                static-body></a-plane>
+
+            <!-- Parede da Frente -->
+            <a-box position="0 5 -10" width="20" height="10" depth="0.5" color="#555555" shadow static-body></a-box>
+
+            <!-- Parede Traseira -->
+            <a-box position="0 5 10" width="20" height="10" depth="0.5" color="#555555" shadow static-body></a-box>
+
+            <!-- Parede Esquerda -->
+            <a-box position="-10 5 0" rotation="0 90 0" width="20" height="10" depth="0.5" color="#555555" shadow
+                static-body></a-box>
+
+            <!-- Porta da Garagem -->
+            <a-box position="10 5 0" rotation="0 90 0" width="20" height="10" depth="0.5" color="#777777" shadow
+                static-body></a-box>
+
+            <!-- Teto -->
+            <a-plane position="0 10 0" rotation="90 0 0" width="20" height="20" color="#444444" shadow
+                static-body></a-plane>
+        </a-entity>
+
+        <!-- Bancada e Armários -->
+        <a-entity>
+            <!-- Bancada -->
+            <a-box position="-9.75 1.5 -2.5" rotation="0 90 0" width="15" height="1" depth="1" color="#633b1e" shadow
+                static-body></a-box>
+            <!-- Armários Superiores -->
+            <a-box position="-9.75 3.5 -2.5" rotation="0 90 0" width="15" height="1.5" depth="0.5" color="#222222"
+                shadow static-body></a-box>
+        </a-entity>
+
+
+        <!-- Iluminação (ajustada para o tamanho original da garagem) -->
+        <a-entity light="type: ambient; color: #ffffff; intensity: 0.8"></a-entity>
+        <a-entity light="type: point; color: #ffffff; intensity: 1.5; position: 0 8 0"></a-entity>
+        <a-entity light="type: directional; color: #ffffff; intensity: 0.8; position: -5 10 5" shadow></a-entity>
+
+        <!-- Plataforma giratória para o carro -->
+        <a-entity id="turntable" geometry="primitive: cylinder; radius: 2.5; height: 0.1" material="color: #444444"
+            position="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear;">
+
+            <!-- O carro foi colocado como filho da plataforma para girar junto -->
+            <a-entity gltf-model="#fancy-car" position="0 0.1 0" scale="3 3 3" rotation="0 90 0" shadow>
+            </a-entity>
+        </a-entity>
+
+    </a-scene>
+</body>
+
+</html>

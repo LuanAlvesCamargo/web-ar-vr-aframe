@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <title>Laboratório da Calíope</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <a-scene shadow="type: pcfsoft">
+        <!-- Assets (texturas) -->
+        <a-assets>
+            <img id="metal" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+            <img id="grid" src="https://cdn.aframe.io/a-painter/images/uv-grid.png">
+            <img id="holo" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+        </a-assets>
+
+        <!-- Céu escuro -->
+        <a-sky color="#05070d"></a-sky>
+
+        <!-- Piso metálico -->
+        <a-plane src="#metal" repeat="10 10" position="0 0 0" rotation="-90 0 0" width="30" height="30" shadow>
+        </a-plane>
+
+        <!-- Paredes metálicas -->
+        <a-box src="#grid" repeat="5 5" position="0 2 -15" depth="1" height="4" width="30" color="#111"></a-box>
+        <a-box src="#grid" repeat="5 5" position="0 2 15" depth="1" height="4" width="30" color="#111"></a-box>
+        <a-box src="#grid" repeat="5 5" position="15 2 0" depth="30" height="4" width="1" color="#111"></a-box>
+        <a-box src="#grid" repeat="5 5" position="-15 2 0" depth="30" height="4" width="1" color="#111"></a-box>
+
+        <!-- Teto translúcido -->
+        <a-plane src="#metal" position="0 4 0" rotation="90 0 0" width="30" height="30" color="#333"
+            opacity="0.9"></a-plane>
+
+        <!-- Colunas -->
+        <a-cylinder position="-14 2 -14" radius="0.3" height="4" color="#666" metalness="1"></a-cylinder>
+        <a-cylinder position="14 2 -14" radius="0.3" height="4" color="#666" metalness="1"></a-cylinder>
+        <a-cylinder position="-14 2 14" radius="0.3" height="4" color="#666" metalness="1"></a-cylinder>
+        <a-cylinder position="14 2 14" radius="0.3" height="4" color="#666" metalness="1"></a-cylinder>
+
+        <!-- Cápsula da Calíope -->
+        <a-cylinder position="0 1.5 -4" radius="1.2" height="3.5" color="#0ff" opacity="0.5" metalness="0.5"
+            roughness="0.1"></a-cylinder>
+        <a-text value="Calíope em desenvolvimento..." position="-2 3.5 -4" color="#39ff14" width="6"></a-text>
+
+        <!-- Tubos de energia conectados -->
+        <a-cylinder position="1.5 0.5 -4" radius="0.1" height="1" color="#0ff"></a-cylinder>
+        <a-cylinder position="-1.5 0.5 -4" radius="0.1" height="1" color="#0ff"></a-cylinder>
+        <a-cylinder position="0 0.5 -2.5" rotation="90 0 0" radius="0.1" height="1.5" color="#0ff"></a-cylinder>
+
+        <!-- Terminal holográfico -->
+        <a-box position="3 1 -3" depth="0.2" height="1.5" width="2" color="#0ff" opacity="0.6"></a-box>
+        <a-text value="Terminal: Energia Estável" position="1.5 2.2 -3" color="#fff" width="5"></a-text>
+
+        <!-- Painel holográfico na parede -->
+        <a-plane src="#holo" position="0 2 -14.9" rotation="0 0 0" width="6" height="3" color="#0ff"
+            opacity="0.5"></a-plane>
+        <a-text value="Dados de Pesquisa - Projeto Calíope" position="-2.5 3 -14.8" color="#fff" width="8"></a-text>
+
+        <!-- Artefato mitológico -->
+        <a-sphere position="-4 1.5 -3" radius="0.7" color="#ffcc00" opacity="0.8" emissive="#ffaa00"
+            emissiveIntensity="0.5"></a-sphere>
+        <a-text value="Artefato Digitalizado: Fragmento do Labirinto" position="-7 2.7 -3" color="#fff"
+            width="8"></a-text>
+
+        <!-- Luzes de neon -->
+        <a-light type="point" intensity="2" position="0 3 0" color="#00ffff"></a-light>
+        <a-light type="spot" intensity="1.5" position="0 4 -4" angle="45" color="#39ff14"></a-light>
+        <a-light type="point" intensity="1" position="-3 3 -3" color="#ff0000"></a-light>
+        <a-light type="point" intensity="0.5" position="3 2 -3" color="#ff00ff"></a-light>
+
+        <!-- Câmera -->
+        <a-entity camera look-controls wasd-controls position="0 1.6 8"></a-entity>
+    </a-scene>
+</body>
+
+</html>

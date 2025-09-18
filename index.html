@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Laboratório de Calíope</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .a-scene {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+
+<body>
+    <a-scene physics="gravity: -9.8">
+        <!-- Assets para pré-carregamento -->
+        <a-assets>
+            <img id="metalFloor" src="https://cdn.glitch.global/039c2874-5c50-4d87-8f5b-6101c513233c/metal_texture.jpg"
+                crossorigin="anonymous">
+            <img id="wallTexture"
+                src="https://cdn.glitch.global/039c2874-5c50-4d87-8f5b-6101c513233c/concrete_texture.jpg"
+                crossorigin="anonymous">
+            <audio id="labAmbience"
+                src="https://cdn.glitch.global/039c2874-5c50-4d87-8f5b-6101c513233c/sci-fi-lab-ambience.mp3"
+                preload="auto"></audio>
+            <audio id="blip" src="https://cdn.glitch.global/039c2874-5c50-4d87-8f5b-6101c513233c/blip.wav"
+                preload="auto"></audio>
+        </a-assets>
+
+        <!-- Componente customizado para o terminal -->
+        <script>
+            AFRAME.registerComponent('terminal-logic', {
+                init: function () {
+                    const el = this.el;
+                    const terminalTextEl = document.querySelector('#terminalText');
+                    let step = 0;
+                    const messages = [
+                        '> Inicializando sistemas...',
+                        '> Carregando IA Calíope...',
+                        '> Pronto para testes.'
+                    ];
+
+                    el.addEventListener('click', () => {
+                        el.emit('blip-sound');
+                        terminalTextEl.setAttribute('value', messages[step]);
+                        step = (step + 1) % messages.length;
+                    });
+                }
+            });
+
+            // Componente customizado para botões
+            AFRAME.registerComponent('button-logic', {
+                init: function () {
+                    const el = this.el;
+                    const originalColor = el.getAttribute('color');
+                    el.addEventListener('click', () => {
+                        el.emit('blip-sound');
+                        el.setAttribute('color', '#ff0000');
+                        setTimeout(() => {
+                            el.setAttribute('color', originalColor);
+                        }, 200);
+                    });
+                }
+            });
+        </script>
+
+        <!-- Ambiente e iluminação -->
+        <a-entity light="type: ambient; intensity: 0.2; color: #4f6487"></a-entity>
+        <a-entity light="type: point; intensity: 15; distance: 10; color: #94c6ff" position="0 5 -5"
+            animation="property: light.intensity; from: 0; to: 15; delay: 1500; dur: 1000"></a-entity>
+        <a-entity light="type: point; intensity: 10; distance: 15; color: #94c6ff" position="0 5 5"
+            animation="property: light.intensity; from: 0; to: 10; delay: 2000; dur: 1000"></a-entity>
+
+
+        <!-- Som ambiente -->
+        <a-sound src="#labAmbience" autoplay="true" loop="true" position="0 2 0"></a-sound>
+        <a-sound id="blipSound" src="#blip" on="blip-sound"></a-sound>
+
+        <!-- Piso com textura -->
+        <a-plane rotation="-90 0 0" width="20" height="20" src="#metalFloor" material="metalness: 0.8; roughness: 0.3"
+            static-body></a-plane>
+
+        <!-- Paredes com textura -->
+        <a-box position="0 2.5 -10" depth="0.2" height="5" width="20" src="#wallTexture" static-body></a-box>
+        <a-box position="0 2.5 10" depth="0.2" height="5" width="20" src="#wallTexture" static-body></a-box>
+        <a-box position="-10 2.5 0" depth="20" height="5" width="0.2" src="#wallTexture" static-body></a-box>
+        <a-box position="10 2.5 0" depth="20" height="5" width="0.2" src="#wallTexture" static-body></a-box>
+
+        <!-- Teto -->
+        <a-plane position="0 5 0" rotation="90 0 0" width="20" height="20" color="#cfcfcf" static-body></a-plane>
+
+        <!-- Bancadas e computadores -->
+        <a-box position="-6 0.5 -6" depth="2" height="1" width="3" color="#1a1a1a" static-body></a-box>
+        <a-box position="6 0.5 -6" depth="2" height="1" width="3" color="#1a1a1a" static-body></a-box>
+        <a-box position="-6 0.5 6" depth="2" height="1" width="3" color="#1a1a1a" static-body></a-box>
+        <a-box position="6 0.5 6" depth="2" height="1" width="3" color="#1a1a1a" static-body></a-box>
+
+        <!-- Computadores -->
+        <a-box position="-6 1.3 -6" depth="0.2" height="1" width="1.5" color="#000"></a-box>
+        <a-box position="-6 0.8 -5.8" depth="0.5" height="0.5" width="0.5" color="#000"></a-box>
+        <a-box position="6 1.3 -6" depth="0.2" height="1" width="1.5" color="#000"></a-box>
+        <a-box position="6 0.8 -5.8" depth="0.5" height="0.5" width="0.5" color="#000"></a-box>
+        <a-box position="-6 1.3 6" depth="0.2" height="1" width="1.5" color="#000"></a-box>
+        <a-box position="-6 0.8 6.2" depth="0.5" height="0.5" width="0.5" color="#000"></a-box>
+        <a-box position="6 1.3 6" depth="0.2" height="1" width="1.5" color="#000"></a-box>
+        <a-box position="6 0.8 6.2" depth="0.5" height="0.5" width="0.5" color="#000"></a-box>
+
+        <!-- Painel de controle -->
+        <a-box position="0 1.2 -9.8" depth="0.2" height="1.8" width="3" color="#1a1a1a" static-body></a-box>
+        <a-box id="button1" button-logic position="-0.8 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#2ecc71"
+            static-body></a-box>
+        <a-box id="button2" button-logic position="0 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#e74c3c"
+            static-body></a-box>
+        <a-box id="button3" button-logic position="0.8 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#3498db"
+            static-body></a-box>
+        <a-text value="PAINEL DE CONTROLE" position="-1.2 2 -9.65" color="#eee" width="2.5"></a-text>
+
+        <!-- Cápsula da Calíope -->
+        <a-cylinder position="0 2 -4" radius="1.2" height="4" color="#00e5ff" opacity="0.2" metalness="0.5"
+            roughness="0.1"
+            animation="property: material.opacity; to: 0.5; loop: true; dir: alternate; dur: 2000;"></a-cylinder>
+        <a-text value="Calíope em desenvolvimento..." position="-2 4 -4" color="#333" width="6"></a-text>
+
+        <!-- Terminal interativo com lógica customizada -->
+        <a-box id="terminal" position="0 1 -3" depth="0.5" height="1" width="1.5" color="#1a1a1a"
+            terminal-logic></a-box>
+        <a-text id="terminalText" value="> Terminal Ativo" color="#00ff00" position="-0.7 1.4 -2.7"
+            scale="0.8 0.8 0.8"></a-text>
+        <a-box position="-0.75 1.4 -2.8" width="1.5" height="0.2" depth="0.1" color="#00ff00"
+            animation="property: width; from: 0; to: 1.5; dur: 1000; delay: 500; easing: easeOutExpo"></a-box>
+
+
+        <!-- Elementos de UI de anime flutuantes -->
+        <a-entity position="4 2 4" scale="0.5 0.5 0.5" rotation="0 45 0">
+            <a-plane width="3" height="3" color="#00e5ff" opacity="0.1"
+                animation="property: rotation; to: 0 40 0; loop: true; dir: alternate; dur: 5000;"></a-plane>
+            <a-plane width="1.5" height="1.5" color="#00e5ff" opacity="0.2" position="0 0 0.1"></a-plane>
+            <a-box width="0.2" height="0.2" depth="0.2" position="-0.75 0.75 0.2" color="#00ff00"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000;"></a-box>
+            <a-text value="DIAGNÓSTICO" color="#ffffff" position="0 0.2 0.2" scale="1.5 1.5 1.5"></a-text>
+        </a-entity>
+
+        <a-entity position="-4 2 -4" scale="0.5 0.5 0.5" rotation="0 -45 0">
+            <a-plane width="3" height="3" color="#00e5ff" opacity="0.1"
+                animation="property: rotation; to: 0 -40 0; loop: true; dir: alternate; dur: 5000;"></a-plane>
+            <a-plane width="1.5" height="1.5" color="#00e5ff" opacity="0.2" position="0 0 0.1"></a-plane>
+            <a-box width="0.2" height="0.2" depth="0.2" position="0.75 -0.75 0.2" color="#00ff00"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000;"></a-box>
+            <a-text value="ANÁLISE DE DADOS" color="#ffffff" position="0 0.2 0.2" scale="1.5 1.5 1.5"></a-text>
+        </a-entity>
+
+
+        <!-- Câmera com movimento e colisão -->
+        <a-entity id="rig" position="0 1.6 5" kinematics-body>
+            <a-entity camera look-controls wasd-controls="acceleration: 20">
+                <a-cursor></a-cursor>
+            </a-entity>
+        </a-entity>
+
+    </a-scene>
+</body>
+
+</html>
