@@ -37,6 +37,10 @@
                 preload="auto"></audio>
             <!-- Nova imagem para o interior da cápsula -->
             <img id="insideImage" src="Imagem colada.jpg" crossorigin="anonymous">
+            <!-- Imagens para o novo painel de controle de defesa -->
+            <img id="artemis-image" src="/img/Artemis.png" crossorigin="anonymous">
+            <img id="harpias-image" src="/img/Harpias.jpg" crossorigin="anonymous">
+            <img id="minos-image" src="/img/Minos.jpg" crossorigin="anonymous">
         </a-assets>
 
         <!-- Componente customizado para o terminal -->
@@ -65,15 +69,14 @@
                             terminalTextEl.setAttribute('value', "> Terminal Ativo\nClique para Acessar Relatório");
                             terminalTextEl.setAttribute('scale', "0.8 0.8 0.8");
                             terminalTextEl.setAttribute('width', "1.5");
+                            terminalTextEl.setAttribute('align', "center");
                             currentParagraph = -1;
                         } else {
-                            let textToShow = "";
-                            for (let i = 0; i <= currentParagraph; i++) {
-                                textToShow += paragraphs[i] + "\n\n";
-                            }
-                            terminalTextEl.setAttribute('value', textToShow.trim());
+                            // Mostra apenas o parágrafo atual
+                            terminalTextEl.setAttribute('value', paragraphs[currentParagraph]);
                             terminalTextEl.setAttribute('scale', "0.4 0.4 0.4");
                             terminalTextEl.setAttribute('width', "3");
+                            terminalTextEl.setAttribute('align', "center");
                         }
                     });
                 }
@@ -121,6 +124,75 @@
                     clearInterval(this.intervalId);
                 }
             });
+
+            // Componente para lógica do painel de diagnóstico
+            AFRAME.registerComponent('diagnostico-logic', {
+                init: function () {
+                    const el = this.el;
+                    const textEl = el.querySelector('#diagnosticoText');
+                    const diagnosticoParagraphs = [
+                        "O Instituto Helios é um centro de pesquisa avançada dedicado ao desenvolvimento de tecnologias emergentes em inteligência artificial, robótica e sistemas distribuídos. Fundado com o objetivo de expandir os limites do conhecimento humano, o instituto atua em projetos que combinam inovação tecnológica com impacto social e científico.",
+                        "Sua estrutura conta com laboratórios de última geração, onde equipes multidisciplinares trabalham na criação de protótipos inteligentes, simulações em realidade virtual e integração entre máquinas e humanos. Esses ambientes controlados permitem testar conceitos em condições seguras e progressivamente mais complexas.",
+                        "O instituto também é responsável pela formação de novas gerações de cientistas e engenheiros, fomentando a colaboração entre áreas como ciência da computação, engenharia elétrica, biotecnologia e filosofia da tecnologia. Mais do que criar máquinas, o Instituto Helios busca compreender e redefinir a relação entre humanidade, conhecimento e inovação."
+                    ];
+                    let currentParagraph = -1;
+
+                    el.addEventListener('click', () => {
+                        el.emit('blip-sound');
+                        currentParagraph = (currentParagraph + 1) % (diagnosticoParagraphs.length + 1);
+                        if (currentParagraph === diagnosticoParagraphs.length) {
+                            textEl.setAttribute('value', "Instituto Helios");
+                            textEl.setAttribute('scale', "2 2 2");
+                            textEl.setAttribute('width', "auto");
+                            textEl.setAttribute('align', "center");
+                            currentParagraph = -1;
+                        } else {
+                            textEl.setAttribute('value', diagnosticoParagraphs[currentParagraph]);
+                            textEl.setAttribute('scale', "0.8 0.8 0.8");
+                            textEl.setAttribute('width', "4");
+                            textEl.setAttribute('align', "center");
+                        }
+                    });
+                }
+            });
+
+            // Novo componente para o painel de defesa
+            AFRAME.registerComponent('defense-panel-logic', {
+                init: function () {
+                    const panel = this.el;
+                    const imagePlane = panel.querySelector('#defenseImage');
+                    const captionText = panel.querySelector('#defenseCaption');
+
+                    panel.querySelectorAll('.defense-button').forEach(button => {
+                        button.addEventListener('click', (evt) => {
+                            evt.stopPropagation(); // Evita que o evento de clique se propague para outros elementos
+                            const buttonId = button.id;
+                            let imageSrc = '';
+                            let caption = '';
+
+                            switch (buttonId) {
+                                case 'button1':
+                                    imageSrc = '#artemis-image';
+                                    caption = 'Drone de defesa Ártemis';
+                                    break;
+                                case 'button2':
+                                    imageSrc = '#harpias-image';
+                                    caption = 'Drone de Combate Harpias';
+                                    break;
+                                case 'button3':
+                                    imageSrc = '#minos-image';
+                                    caption = 'Agente Robótico de IA Minos (último recurso)';
+                                    break;
+                            }
+
+                            imagePlane.setAttribute('src', imageSrc);
+                            captionText.setAttribute('value', caption);
+
+                            panel.emit('blip-sound');
+                        });
+                    });
+                }
+            });
         </script>
 
         <!-- Ambiente e iluminação -->
@@ -130,10 +202,6 @@
         <a-entity light="type: point; intensity: 10; distance: 15; color: #94c6ff" position="0 5 5"
             animation="property: light.intensity; from: 0; to: 10; delay: 2000; dur: 1000"></a-entity>
 
-
-        <!-- Som ambiente -->
-        <a-sound src="#labAmbience" autoplay="true" loop="true" position="0 2 0"></a-sound>
-        <a-sound id="blipSound" src="#blip" on="blip-sound"></a-sound>
 
         <!-- Piso com textura -->
         <a-plane rotation="-90 0 0" width="20" height="20" src="#metalFloor" material="metalness: 0.8; roughness: 0.3"
@@ -164,15 +232,24 @@
         <a-box position="6 1.3 6" depth="0.2" height="1" width="1.5" color="#000"></a-box>
         <a-box position="6 0.8 6.2" depth="0.5" height="0.5" width="0.5" color="#000"></a-box>
 
-        <!-- Painel de controle -->
-        <a-box position="0 1.2 -9.8" depth="0.2" height="1.8" width="3" color="#1a1a1a" static-body></a-box>
-        <a-box id="button1" button-logic position="-0.8 1.4 -20.65" depth="0.2" height="0.3" width="0.2" color="#2ecc71"
-            static-body></a-box>
-        <a-box id="button2" button-logic position="0 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#e74c3c"
-            static-body></a-box>
-        <a-box id="button3" button-logic position="0.8 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#3498db"
-            static-body></a-box>
-        <a-text value="PAINEL DE CONTROLE" position="-1.2 2 -9.65" color="#eee" width="2.5"></a-text>
+        <!-- Painel de controle holográfico -->
+        <a-entity position="0 1.2 -9.0" defense-panel-logic>
+            <a-box depth="0.2" height="1.8" width="3" color="#00e5ff" opacity="0.2" static-body></a-box>
+            <a-plane width="3" height="1.8" color="#00e5ff" opacity="0.1" position="0 0 0.1"
+                animation="property: opacity; from: 0.1; to: 0.15; loop: true; dir: alternate; dur: 1500;"></a-plane>
+            <a-box id="button1" class="defense-button" position="-0.8 0.2 0.2" depth="0.2" height="0.3" width="0.2"
+                color="#2ecc71" static-body></a-box>
+            <a-box id="button2" class="defense-button" position="0 0.2 0.2" depth="0.2" height="0.3" width="0.3"
+                color="#e74c3c" static-body></a-box>
+            <a-box id="button3" class="defense-button" position="0.8 0.2 0.2" depth="0.2" height="0.3" width="0.3"
+                color="#3498db" static-body></a-box>
+            <a-text value="PAINEL DE DEFESA HOLOGRÁFICO" position="0 0.7 0.2" color="#00ffff" width="2.5"
+                align="center"></a-text>
+            <a-plane id="defenseImage" material="side: double; transparent: true" width="1.5" height="1"
+                position="0 -0.4 0.2" opacity="0.8"></a-plane>
+            <a-text id="defenseCaption" value="Clique nos botões para visualizar" position="0 -0.95 0.2" color="#00ff00"
+                width="1.5" align="center"></a-text>
+        </a-entity>
 
         <!-- Container da Cápsula da Calíope -->
         <a-entity position="0 2 -4">
@@ -188,30 +265,36 @@
             </a-cylinder>
 
             <!-- Imagem flutuante dentro da cápsula -->
-            <a-plane src="#insideImage" material="side: double" width="1.5" height="1.5" position="0 0.5 0"
+            <a-plane src="img/Caliope.png" material="side: double" width="1.5" height="1.5" position="0 0.5 0"
                 rotation="0 0 0"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear;"></a-plane>
 
-            <a-text value="Calíope em desenvolvimento..." position="-2 2 -4" color="#333" width="6"></a-text>
+            <a-text value="Calíope em desenvolvimento" position="-0.2 2 1.5" color="#ffffff " width="6"
+                align="center"></a-text>
         </a-entity>
 
-        <!-- Terminal interativo com lógica customizada -->
-        <a-box id="terminal" position="0 1 -3" depth="0.5" height="1" width="1.5" color="#1a1a1a"
-            terminal-logic></a-box>
-        <a-text id="terminalText" value="> Terminal Ativo\nClique para Acessar Relatório" color="#00ff00"
-            position="-0.7 1.4 -2.5" scale="0.8 0.8 0.8" width="1.5"></a-text>
-        <a-box position="-0.75 1.4 -2.8" width="1.5" height="0.2" depth="0.1" color="#00ff00"
-            animation="property: width; from: 0; to: 1.5; dur: 1000; delay: 500; easing: easeOutExpo"></a-box>
-
+        <!-- Novo Terminal interativo com aparência moderna -->
+        <a-entity id="terminal-container" position="-0.75 1.4 -2.8" terminal-logic>
+            <a-plane width="1.5" height="1.2" color="#000" opacity="0.5"
+                animation__opacity="property: opacity; from: 0.5; to: 0.7; loop: true; dir: alternate; dur: 2000;"></a-plane>
+            <a-plane width="1.5" height="1.2" color="#00ff00" opacity="0.1"
+                animation="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; loop: true; dir: alternate; dur: 3000;"></a-plane>
+            <a-text id="terminalText" value="> Terminal Ativo\nClique para Acessar Relatório" color="#00ff00"
+                position="0 0 0.05" scale="0.8 0.8 0.8" width="1.5" align="center"></a-text>
+        </a-entity>
 
         <!-- Elementos de UI de anime flutuantes -->
-        <a-entity position="4 2 4" scale="0.5 0.5 0.5" rotation="0 45 0">
+        <a-entity position="0 2 8" scale="0.5 0.5 0.5" rotation="0 180 0" diagnostico-logic>
+            <!-- Painel com animação, agora é o pai do texto -->
             <a-plane width="3" height="3" color="#00e5ff" opacity="0.1"
-                animation="property: rotation; to: 0 40 0; loop: true; dir: alternate; dur: 5000;"></a-plane>
+                animation="property: rotation; to: 0 40 0; loop: true; dir: alternate; dur: 5000;">
+                <a-text id="diagnosticoText" value="Instituto Helios" color="#ffffff" position="0 0 0.2" align="center"
+                    scale="2 2 2" width="auto"></a-text>
+            </a-plane>
+
             <a-plane width="1.5" height="1.5" color="#00e5ff" opacity="0.2" position="0 0 0.1"></a-plane>
             <a-box width="0.2" height="0.2" depth="0.2" position="-0.75 0.75 0.2" color="#00ff00"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 2000;"></a-box>
-            <a-text value="DIAGNÓSTICO" color="#ffffff" position="0 0.2 0.2" scale="1.5 1.5 1.5"></a-text>
         </a-entity>
 
         <a-entity position="-4 2 -4" scale="0.5 0.5 0.5" rotation="0 -45 0">
