@@ -6,7 +6,7 @@
     <title>Laboratório de Calíope</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script
-        src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+        src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v5.0.0/dist/aframe-physics-system.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -35,25 +35,46 @@
                 preload="auto"></audio>
             <audio id="blip" src="https://cdn.glitch.global/039c2874-5c50-4d87-8f5b-6101c513233c/blip.wav"
                 preload="auto"></audio>
+            <!-- Nova imagem para o interior da cápsula -->
+            <img id="insideImage" src="Imagem colada.jpg" crossorigin="anonymous">
         </a-assets>
 
         <!-- Componente customizado para o terminal -->
         <script>
+            // Lógica para o terminal
             AFRAME.registerComponent('terminal-logic', {
                 init: function () {
                     const el = this.el;
                     const terminalTextEl = document.querySelector('#terminalText');
-                    let step = 0;
-                    const messages = [
-                        '> Inicializando sistemas...',
-                        '> Carregando IA Calíope...',
-                        '> Pronto para testes.'
+                    let currentParagraph = -1;
+                    const paragraphs = [
+                        "Projeto Calíope — Relatório de Desenvolvimento",
+                        "A unidade Calíope é um protótipo de robô humanoide desenvolvido no Instituto Helios, cujo objetivo principal é a integração entre sistemas de inteligência artificial adaptativa e módulos de aprendizado contínuo.",
+                        "A concepção do projeto busca explorar três áreas fundamentais:",
+                        "Processamento Cognitivo Avançado – Implementação de redes neurais artificiais capazes de reconfiguração dinâmica, permitindo à unidade responder a ambientes imprevistos.",
+                        "Integração Sensorial Multimodal – Conjunto de sensores visuais, táteis e auditivos projetados para coleta de dados em tempo real, facilitando processos de análise contextual.",
+                        "Aprimoramento Progressivo de Habilidades – Estrutura modular que possibilita a instalação gradual de novos conhecimentos e funções, simulando um processo de evolução cognitiva.",
+                        "O nome Calíope foi atribuído em referência à musa da eloquência e da poesia épica da mitologia grega, simbolizando a união entre racionalidade tecnológica e criatividade humana.",
+                        "No estágio atual, a unidade encontra-se em fase de testes laboratoriais, restrita ao ambiente controlado do instituto. O próximo passo será validar sua capacidade de interação com sistemas externos e resolução de problemas complexos em cenários simulados."
                     ];
 
                     el.addEventListener('click', () => {
                         el.emit('blip-sound');
-                        terminalTextEl.setAttribute('value', messages[step]);
-                        step = (step + 1) % messages.length;
+                        currentParagraph = (currentParagraph + 1) % (paragraphs.length + 1);
+                        if (currentParagraph === paragraphs.length) {
+                            terminalTextEl.setAttribute('value', "> Terminal Ativo\nClique para Acessar Relatório");
+                            terminalTextEl.setAttribute('scale', "0.8 0.8 0.8");
+                            terminalTextEl.setAttribute('width', "1.5");
+                            currentParagraph = -1;
+                        } else {
+                            let textToShow = "";
+                            for (let i = 0; i <= currentParagraph; i++) {
+                                textToShow += paragraphs[i] + "\n\n";
+                            }
+                            terminalTextEl.setAttribute('value', textToShow.trim());
+                            terminalTextEl.setAttribute('scale', "0.4 0.4 0.4");
+                            terminalTextEl.setAttribute('width', "3");
+                        }
                     });
                 }
             });
@@ -70,6 +91,34 @@
                             el.setAttribute('color', originalColor);
                         }, 200);
                     });
+                }
+            });
+
+            // Componente para animação de texto binário
+            AFRAME.registerComponent('binary-text-animator', {
+                schema: {
+                    length: {
+                        type: 'int',
+                        default: 12
+                    },
+                    interval: {
+                        type: 'int',
+                        default: 100
+                    }
+                },
+                init: function () {
+                    this.updateText = this.updateText.bind(this);
+                    this.intervalId = setInterval(this.updateText, this.data.interval);
+                },
+                updateText: function () {
+                    let binaryString = "";
+                    for (let i = 0; i < this.data.length; i++) {
+                        binaryString += Math.round(Math.random());
+                    }
+                    this.el.setAttribute('value', binaryString);
+                },
+                remove: function () {
+                    clearInterval(this.intervalId);
                 }
             });
         </script>
@@ -117,7 +166,7 @@
 
         <!-- Painel de controle -->
         <a-box position="0 1.2 -9.8" depth="0.2" height="1.8" width="3" color="#1a1a1a" static-body></a-box>
-        <a-box id="button1" button-logic position="-0.8 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#2ecc71"
+        <a-box id="button1" button-logic position="-0.8 1.4 -20.65" depth="0.2" height="0.3" width="0.2" color="#2ecc71"
             static-body></a-box>
         <a-box id="button2" button-logic position="0 1.4 -9.65" depth="0.2" height="0.3" width="0.3" color="#e74c3c"
             static-body></a-box>
@@ -125,17 +174,32 @@
             static-body></a-box>
         <a-text value="PAINEL DE CONTROLE" position="-1.2 2 -9.65" color="#eee" width="2.5"></a-text>
 
-        <!-- Cápsula da Calíope -->
-        <a-cylinder position="0 2 -4" radius="1.2" height="4" color="#00e5ff" opacity="0.2" metalness="0.5"
-            roughness="0.1"
-            animation="property: material.opacity; to: 0.5; loop: true; dir: alternate; dur: 2000;"></a-cylinder>
-        <a-text value="Calíope em desenvolvimento..." position="-2 4 -4" color="#333" width="6"></a-text>
+        <!-- Container da Cápsula da Calíope -->
+        <a-entity position="0 2 -4">
+            <!-- Cilindro externo (o tubo) -->
+            <a-cylinder position="0 0 0" radius="1.2" height="4" color="#00e5ff" opacity="0.15" metalness="0.5"
+                roughness="0.1"></a-cylinder>
+
+            <!-- Cilindro interno (o líquido) -->
+            <a-cylinder position="0 0.5 0" radius="1.1" height="3" color="#00aaff" opacity="0.8" metalness="0.8"
+                roughness="0.1"
+                animation__opacity="property: material.opacity; to: 0.9; loop: true; dir: alternate; dur: 2500;"
+                animation__position="property: position; to: 0 0.4 0; loop: true; dir: alternate; dur: 3000;">
+            </a-cylinder>
+
+            <!-- Imagem flutuante dentro da cápsula -->
+            <a-plane src="#insideImage" material="side: double" width="1.5" height="1.5" position="0 0.5 0"
+                rotation="0 0 0"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear;"></a-plane>
+
+            <a-text value="Calíope em desenvolvimento..." position="-2 2 -4" color="#333" width="6"></a-text>
+        </a-entity>
 
         <!-- Terminal interativo com lógica customizada -->
         <a-box id="terminal" position="0 1 -3" depth="0.5" height="1" width="1.5" color="#1a1a1a"
             terminal-logic></a-box>
-        <a-text id="terminalText" value="> Terminal Ativo" color="#00ff00" position="-0.7 1.4 -2.7"
-            scale="0.8 0.8 0.8"></a-text>
+        <a-text id="terminalText" value="> Terminal Ativo\nClique para Acessar Relatório" color="#00ff00"
+            position="-0.7 1.4 -2.5" scale="0.8 0.8 0.8" width="1.5"></a-text>
         <a-box position="-0.75 1.4 -2.8" width="1.5" height="0.2" depth="0.1" color="#00ff00"
             animation="property: width; from: 0; to: 1.5; dur: 1000; delay: 500; easing: easeOutExpo"></a-box>
 
@@ -151,12 +215,16 @@
         </a-entity>
 
         <a-entity position="-4 2 -4" scale="0.5 0.5 0.5" rotation="0 -45 0">
+            <!-- PAINEL COM ANIMAÇÃO, AGORA É O PAI DO TEXTO BINÁRIO -->
             <a-plane width="3" height="3" color="#00e5ff" opacity="0.1"
-                animation="property: rotation; to: 0 -40 0; loop: true; dir: alternate; dur: 5000;"></a-plane>
+                animation="property: rotation; to: 0 -40 0; loop: true; dir: alternate; dur: 5000;">
+                <a-text id="binaryText" binary-text-animator="length: 12; interval: 100" color="#ffffff"
+                    position="0 0 0.2" align="center" scale="1.5 1.5 1.5"></a-text>
+            </a-plane>
+
             <a-plane width="1.5" height="1.5" color="#00e5ff" opacity="0.2" position="0 0 0.1"></a-plane>
             <a-box width="0.2" height="0.2" depth="0.2" position="0.75 -0.75 0.2" color="#00ff00"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 2000;"></a-box>
-            <a-text value="ANÁLISE DE DADOS" color="#ffffff" position="0 0.2 0.2" scale="1.5 1.5 1.5"></a-text>
         </a-entity>
 
 
